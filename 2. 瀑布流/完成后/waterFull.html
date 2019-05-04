@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .itemBox {
+            width: 1050px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .item {
+            border: 1px solid #ccc;
+            padding: 4px;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="itemBox">
+        <div class="item">
+            <img src="./images/P_000.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_001.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_002.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_003.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_004.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_005.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_006.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_007.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_008.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_009.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_000.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_001.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_002.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_003.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_004.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_005.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_006.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_007.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_008.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="./images/P_009.jpg" alt="">
+        </div>
+    </div>
+</body>
+<script>
+	window.onload = function() {
+		// 获取元素
+		var itemBox = document.getElementsByClassName('itemBox')[0];
+		var items = document.getElementsByClassName('item');
+		var item = items[0];
+		// 获取属性
+		// 总宽度
+		var itemBoxW = itemBox.offsetWidth;
+		// item 宽度
+		var itemW = item.offsetWidth;
+		// 获取列数
+		var column = parseInt(itemBoxW / itemW);
+		// 获取间隔
+		var distance = (itemBoxW - itemW * column) / (column - 1);
+		//console.log(distance, column);
+		// 瀑布流显示图片
+		var columns = []; // 记录瀑布流高度的数据
+		for(var i = 0; i < items.length; i++) {
+			var item = items[i];
+			var data = getHMin(column, columns);
+			// 更新位置
+			item.style.left = data.index * (itemW + distance) + 'px';
+			item.style.top = data.height + 'px';
+			// 更新高度
+			columns[data.index] += (item.offsetHeight+distance);
+		}
+		console.log(columns);
+		// 滚动事件
+		window.onscroll = function(e) {
+			// 判断是否滑动到最低的照片
+			//console.log(this.pageYOffset+this.innerHeight, getHMin(column, columns).height)
+			if(this.pageYOffset+this.innerHeight >= getHMin(column, columns).height) {
+				// 加载新数据
+				var json = [
+                    { "src": "./images/P_000.jpg" },
+                    { "src": "./images/P_001.jpg" },
+                    { "src": "./images/P_002.jpg" },
+                    { "src": "./images/P_003.jpg" },
+                    { "src": "./images/P_004.jpg" },
+                    { "src": "./images/P_005.jpg" },
+                    { "src": "./images/P_006.jpg" },
+                    { "src": "./images/P_007.jpg" },
+                    { "src": "./images/P_008.jpg" },
+                    { "src": "./images/P_009.jpg" },
+                    { "src": "./images/P_010.jpg" }
+                ];
+				// 添加到视图
+				for(var i = 0; i < json.length; i++) {
+					// 创建元素
+					var div = document.createElement('div');
+					var img = document.createElement('img');
+					// 添加属性
+					div.className='item';
+					img.src = json[i].src;
+					// 添加到父元素中
+					div.appendChild(img);
+					itemBox.appendChild(div);
+					// 更新div 位置
+					var data = getHMin(column, columns);
+					// 更新位置
+					div.style.left = data.index * (itemW + distance) + 'px';
+					div.style.top = data.height + 'px';
+					// 更新高度
+					columns[data.index] += (div.offsetHeight+distance);
+				}
+			}
+		}
+	}
+	// 获取列数中高度最小的一列
+	function getHMin(column, columns) {
+		var minI = 0;
+		var minH = columns[0];
+		for(var i = 0; i < column; i++) {
+			// 判断是否初始化过
+			if(columns[i] === undefined) {
+				columns[i] = 0;
+				return {
+					index: i,
+					height: columns[i]
+				}
+			}
+			if(minH > columns[i]) {
+				minI = i;
+				minH = columns[i];
+			}
+		}
+		return {
+			index: minI,
+			height: minH
+		}
+	}
+</script>
+</html>
