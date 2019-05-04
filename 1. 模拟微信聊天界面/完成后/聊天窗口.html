@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>微信聊天窗口</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			list-style: none;
+			font-family: '微软雅黑'
+		}
+
+		#container {
+			width: 450px;
+			height: 600px;
+			background: #eee;
+			margin: 10px auto 0;
+			position: relative;
+			box-shadow: 0px 0px 16px #999;
+		}
+
+		.header {
+			background: #000;
+			height: 34px;
+			color: #fff;
+			height: 40px;
+			line-height: 40px;
+			font-size: 20px;
+			padding: 0 10px;
+		}
+
+		.footer {
+			width: 430px;
+			height: 40px;
+			background: #999;
+			position: absolute;
+			bottom: 0;
+			padding: 10px;
+		}
+
+		.footer input {
+			width: 300px;
+			height: 38px;
+			outline: none;
+			font-size: 16px;
+			text-indent: 10px;
+			position: absolute;
+			border-radius: 6px;
+			right: 80px;
+		}
+
+		.footer span {
+			display: inline-block;
+			width: 62px;
+			height: 38px;
+			background: #ccc;
+			font-weight: 900;
+			line-height: 38px;
+			cursor: pointer;
+			text-align: center;
+			position: absolute;
+			right: 10px;
+			top: 14px;
+			border-radius: 6px;
+		}
+
+		.footer span:hover {
+			color: #777;
+			background: #ddd;
+		}
+
+		.icon {
+			display: inline-block;
+			background: red;
+			width: 50px;
+			height: 50px;
+			border-radius: 30px;
+			position: absolute;
+			bottom: 3px;
+			left: 10px;
+			cursor: pointer;
+			overflow: hidden;
+		}
+
+		img {
+			width: 60px;
+			height: 60px;
+			border-radius: 8px;
+		}
+
+		.content {
+			font-size: 20px;
+			width: 435px;
+			height: 662px;
+			overflow: auto;
+			padding: 5px;
+		}
+
+		.content li {
+			margin-top: 10px;
+			padding-left: 10px;
+			width: 412px;
+			display: block;
+			clear: both;
+			overflow: hidden;
+		}
+
+		.content li img {
+			float: left;
+		}
+
+		.content li span {
+			background: #7cfc00;
+			padding: 10px;
+			border-radius: 10px;
+			float: left;
+			margin: 6px 10px 0 10px;
+			max-width: 310px;
+			border: 1px solid #ccc;
+			box-shadow: 0 0 3px #ccc;
+		}
+
+		.content li img.imgleft {
+			float: left;
+		}
+
+		.content li img.imgright {
+			float: right;
+		}
+
+		.content li span.spanleft {
+			float: left;
+			background: #fff;
+		}
+
+		.content li span.spanright {
+			float: right;
+			background: #7cfc00;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="container">
+		<div class="header"> <span style="float: right;">20:30</span> <span style="float: left;">小泽老师</span> </div>
+
+		<ul class="content"></ul>
+
+		<div class="footer">
+			<div class="icon"> <img src="img/1.png" alt="" id="icon"> </div>
+			<input id="text" type="text" placeholder="说点什么吧..."> <span id="btn">发送</span> </div>
+	</div>
+</body>
+<script>
+	// 获取头像对应元素
+	var avator = document.getElementById('icon');
+	// 判断当前发送消息的对象
+	var mySelf = true;
+	// 存放头像图片位置的数组
+	var imgAddr = ["img/1.png", "img/2.png"]
+	// 点击切换头像事件
+	avator.onclick = function(e) {
+	  if(mySelf) {
+		avator.src= imgAddr[1];
+		mySelf = false;
+	  } else {
+		avator.src= imgAddr[0];
+		mySelf = true;
+	  }
+	}
+	
+	// 获取发送按钮
+	var btn = document.getElementById('btn');
+	// 获取信息栏
+	var content = document.getElementsByClassName('content')[0]
+	// 获取输入框
+	var input = document.getElementById('text');
+	console.log(content);
+	// 点击发送信息事件
+	btn.onclick = function(e) {
+	  // 验证发送信息
+	  var text = input.value;
+	  if(!text) {
+	    alert('请输入发送信息!');
+		return;
+	  }
+	  // 处理自己发送的信息
+	  var li = document.createElement('li');
+	  var img = document.createElement('img');
+	  var span = document.createElement('span');
+	  if(mySelf) {
+		// 设置属性
+		img.src=imgAddr[0];
+		img.className='imgleft'
+		span.className='spanleft'
+	  } else {
+		img.src=imgAddr[1];
+		img.className='imgright'
+		span.className='spanright'
+	  }
+	  span.innerText=text
+	  // 添加child
+	  li.appendChild(img);
+	  li.appendChild(span);
+	  content.appendChild(li);
+	  input.value=''
+	}
+</script>
+</html>
