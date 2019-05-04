@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #game {
+            width: 800px;
+            height: 600px;
+            background: url('./images/sky.png');
+            position: relative;
+            overflow: hidden;
+        }
+
+        #bird {
+            width: 34px;
+            height: 25px;
+            background: url('./images/birds.png') -8px -10px no-repeat;
+            position: absolute;
+            top: 100px;
+            left: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game">
+        <div id="bird"></div>
+    </div>
+	<span>分数:</span><span id="count">0</span>
+</body>
+<script>
+	// 获取元素
+	var game = document.getElementById('game');
+	var birdEle = document.getElementById('bird');
+	var c = document.getElementById('count');
+	// 分数
+	var count = 0;
+	// 游戏背景
+	var sky = {
+		x: 0,
+		step: -5
+	};
+	// 小鸟
+	var bird = {
+	    width: 34,
+		height: 25,
+		speedX: 0,
+		speedY: 0,
+		x: birdEle.offsetLeft,
+		y: birdEle.offsetTop
+	};
+	// 游戏状态
+	var isRunning = true;
+	// 游戏运行状态
+	var running = setInterval(function() {
+		if(isRunning) {
+			// 更新背景位置
+			sky.x += sky.step;
+			game.style.backgroundPositionX = sky.x + 'px';
+			
+			// 更新小鸟位置
+			bird.speedY++;
+			bird.y += bird.speedY;
+			console.log(birdEle.offsetHeight, game.clientHeight)
+			// 判断游戏是否结束
+			// 触碰到顶部
+			if(bird.y <= 0) {
+				isRunning = false;
+				bird.y = 0;
+			}
+			// 触碰到底部
+			if(bird.y + birdEle.offsetHeight >= game.clientHeight) {
+				bird.y = 600 - birdEle.offsetHeight;
+				isRunning = false;
+			}
+			// 更新小鸟位置4
+			birdEle.style.top = bird.y + 'px';
+		} else {
+			// 清楚定时器
+			clearInterval(running);
+			clearInterval(birdRunning);
+			pipes.forEach(pipe => clearInterval(pipe.interval));
+		}	
+	}, 30);
+	
+	// 小鸟运动状态
+	var birdStatus = [-8, -60, -113]
+	var birdI = 0;
+	// 更新小鸟动画
+	var birdRunning = setInterval(function() {
+		if(isRunning) {
+			// 更新小鸟背景
+			birdI= ++birdI % 3;
+			birdEle.style.backgroundPositionX = birdStatus[birdI] + 'px';
+		}
+	}, 100);
+	
+	// 小鸟点击
+	game.onclick = function() {
+		bird.speedY = -10;
+	}
+	
+	// 创建管道
+	// 计算管道的宽度
+	function createPipe(x) {
+		var pipe = {};
+		pipes.push(pipe); // 保存对象用于游戏结束清楚定时器；
+		pipe.x = x;
+		pipe.isThrough = false; // 记录是否通过该管道
+		pipe.uHeight = 50 + parseInt(Math.random() * 250);
+		pipe.tap = parseInt(Math.random() * 200) + 100;
+		pipe.dHeight = 600 - pipe.uHeight - pipe.tap;
+		pipe.dTop = 600 - pipe.dHeight;
+		var uPipe = document.createElement('div');
+		uPipe.style.width='52px';
+		uPipe.style.height=pipe.uHeight + 'px';
+		uPipe.style.top='0px';
+		uPipe.style.left=pipe.x + 'px';
+		uPipe.style.background = 'url("./images/pipe2.png") no-repeat center  bottom';
+		uPipe.style.position = 'absolute';
+		pipe.uPipe = uPipe;
+		
+		var dPipe = document.createElement('div');
+		dPipe.style.width='52px';
+		dPipe.style.height=pipe.dHeight + 'px';
+		dPipe.style.top=pipe.dTop + 'px';
+		dPipe.style.left=pipe.x + 'px';
+		dPipe.style.background = 'url("./images/pipe1.png") no-repeat center  top';
+		dPipe.style.position = 'absolute';
+		pipe.dPipe = dPipe;
+		game.appendChild(uPipe);
+		game.appendChild(dPipe);
+		// 移动管道
+		pipe.interval = setInterval(function() {
+			if(isRunning) {
+				pipe.x -= 2;
+				uPipe.style.left=pipe.x + 'px';
+				dPipe.style.left=pipe.x + 'px';
+				
+				// 碰撞检测 检测小鸟是否碰到管道
+				var uCheck = bird.x + 32 > pipe.x && bird.x < pipe.x + 52 && bird.y < pipe.uHeight;
+				var dCheck = bird.x + 32 > pipe.x && bird.x < pipe.x + 52 && bird.y > 600 - pipe.dHeight - bird.height;
+				if(uCheck || dCheck) {
+					isRunning = false;
+				}
+				// 计算分数
+				if(pipe.isThrough === false && bird.x - bird.width >= pipe.x) {
+					pipe.isThrough = true;
+					count++;
+					c.innerText = count;
+				}
+				
+				// 判断是否出界
+				if(pipe.x <= 0) {
+					pipe.x = 800;
+					pipe.isThrough = false;
+					// 更新管道数值
+					pipe.uHeight = 50 + parseInt(Math.random() * 250);
+					pipe.tap = parseInt(Math.random() * 200) + 100;
+					pipe.dHeight = 600 - pipe.uHeight - pipe.tap;
+					pipe.dTop = 600 - pipe.dHeight;
+					// 更新管道视图
+					pipe.uPipe.style.height=pipe.uHeight + 'px';
+					pipe.dPipe.style.height=pipe.dHeight + 'px';
+					pipe.dPipe.style.top=pipe.dTop + 'px';
+				}
+			}
+		}, 30);
+	};
+	var pipes = [];
+	createPipe(400);
+	createPipe(600);
+	createPipe(800);
+	createPipe(1000);
+</script>
+</html>
