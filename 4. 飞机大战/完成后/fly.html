@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #view {
+            width: 320px;
+            height: 568px;
+            background: url('./img/bg.png');
+            margin: 0 auto;
+        }
+
+        #fly_me {
+            width: 34px;
+            height: 24px;
+            position: absolute;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="view"></div>
+</body>
+<script>
+	// 设置运行状态
+    var isRunning = true;
+	// 创建飞机
+	var flyEle = document.createElement('div');
+	flyEle.id = 'fly_me';
+	flyEle.innerHTML = '<img src="./img/me.png" />';
+	document.body.appendChild(flyEle);
+	// 获取 view 元素
+	var view  = document.getElementById('view');
+	// 获取 view 位置
+	var viewW = view.offsetWidth;
+	var viewH = view.offsetHeight;
+	var viewL = view.offsetLeft;
+	var viewT = view.offsetTop;
+	//console.log(viewL, viewT, viewW, viewH);
+	// 初始化飞机位置
+	flyEle.style.top = parseInt(viewH * 4 / 5) + 'px';
+	flyEle.style.left = viewL + (viewW / 2 - flyEle.clientWidth / 2) + 'px';
+	// 飞机随鼠标移动
+	document.onmousemove = function(e) {
+		// 鼠标位置为飞机中心
+		var flyX = e.clientX - flyEle.clientWidth / 2;
+		var flyY = e.clientY - flyEle.clientHeight / 2;
+		// 把飞机限制在 view 内
+		if(flyX < viewL) flyX = viewL;
+		if(flyX > viewL + viewW - flyEle.clientWidth) flyX = viewL + viewW - flyEle.clientWidth;
+		if(flyY < 0) flyY = 0;
+		if(flyY > viewH - flyEle.clientHeight) flyY = viewH - flyEle.clientHeight;
+		// 更新飞机位置
+		flyEle.style.top = flyY + 'px';
+		flyEle.style.left = flyX + 'px';
+	}
+	
+	// 飞机发送子弹
+	// 子弹对象
+	var bullet = {
+		imgAddr: './img/b.png',
+		width: 6,
+        height: 14,
+		speed: 2,
+		arr: [],
+	}
+	var bulletInteravl = setInterval(function() {
+		if(isRunning) {
+			// 创建子弹
+			var bulletItem = {};
+			var bulletEle = document.createElement('div');
+			bulletEle.style.width = bullet.width;
+			bulletEle.style.height = bullet.height;
+			bulletEle.style.position = 'absolute';
+			bulletEle.innerHTML = '<img src="' + bullet.imgAddr + '" />';
+			document.body.appendChild(bulletEle);
+			bulletItem.item = bulletEle;
+			bullet.arr.push(bulletItem);
+			// 设置子弹位置
+			var buttletX = flyEle.offsetLeft + flyEle.offsetWidth / 2 - bullet.width / 2;
+			var buttletY = flyEle.offsetTop - flyEle.offsetHeight / 2;
+			bulletEle.style.top = buttletY + 'px';
+			bulletEle.style.left = buttletX + 'px';
+			bulletItem.x = buttletX;
+			bulletItem.y = buttletY;
+			
+			// 更新子弹位置
+			//bulletItem.itemInterval = setInterval(function() {
+			//	var y = bulletEle.offsetTop;
+			//	y -= bullet.speed;
+			//	bulletEle.style.top = y + 'px';
+			//	bulletItem.y = y;
+			//	// 判断是否已经超出界面
+			//	if(y < 0) {
+			//		// 清楚子弹和定时器
+			//		clearInterval(bulletItem.itemInterval);
+			//		bullet.arr.shift();
+			//		document.body.removeChild(bulletEle);
+			//	}
+			//}, 100);
+		} else {
+			clearInterval(bulletInteravl);
+		}
+	}, 1000);
+	
+	// 创建敌机
+	var foe = {
+		width: 34,
+        height: 24,
+		speed: 1,
+		imgAddr: './img/foe.png',
+		arr: []
+	}
+	var foeInterval = setInterval(function() {
+		if(isRunning) {
+			// 创建敌机
+			var foeItem = {}
+			var foeEle = document.createElement('div');
+			foeEle.style.width = foe.width;
+			foeEle.style.height = foe.height;
+			foeEle.style.position = 'absolute';
+			foeEle.innerHTML = '<img src="' + foe.imgAddr + '" />';
+			document.body.appendChild(foeEle);
+			foeItem.item = foeEle;
+			foe.arr.push(foeItem);
+			// 敌机随机出现位置
+			var l = viewL;
+			var r = viewL + viewW - foe.width;
+			var foeL = l + parseInt(Math.random() * (r - l));
+			var foeT = 0;
+			foeEle.style.left = foeL + 'px';
+			foeEle.style.top = foeT + 'px';
+			foeItem.x = foeL;
+			foeItem.y = foeT;
+			// 敌机移动
+			// foeItem.itemInterval = setInterval(function() {
+			// 	var foeY = foeEle.offsetTop;
+			//	foeY += foe.speed;
+			//	foeEle.style.top = foeY + 'px';
+			//	foeItem.y = foeY;
+			//	// 判断是否查出界面
+			//	if(foeY > viewH - foe.height) {
+			//		clearInterval(foeItem.itemInterval);
+			//		foe.arr.shift();
+			//		document.body.removeChild(foeEle);
+			//	}
+			//}, 100);
+		} else {
+			clearInterval(foeInterval);
+		}
+	}, 1000);
+	// 子弹运动
+	function bulletMove() {
+		var bullets = bullet.arr;
+		for(let i = 0; i < bullets.length; i++) {
+			var bulletItem = bullets[i];
+			var bulletEle = bulletItem.item;
+			// 更新位置
+			var y = bulletEle.offsetTop;
+			y -= bullet.speed;
+			bulletEle.style.top = y + 'px';
+			bulletItem.y = y;
+			// 判断是否已经超出界面
+			if(y < 0) {
+				// 清楚子弹
+				bullets.splice(i, 1);
+				bulletEle.parentNode.removeChild(bulletEle);
+			}
+		}
+	}
+	// 敌机移动
+	function foeMove() {
+		var foes = foe.arr;
+		for(let i = 0; i < foes.length; i++) {
+			var foeItem = foes[i];
+			var foeEle = foeItem.item;
+			// 更新位置
+			var y = foeEle.offsetTop;
+			y += foe.speed;
+			foeEle.style.top = y + 'px';
+			foeItem.y = y;
+			// 判断是否已经超出界面
+			if(y > viewH - foe.height) {
+				// 清楚子弹
+				foes.splice(i, 1);
+				foeEle.parentNode.removeChild(foeEle);
+			}
+		}
+	}
+	// 碰撞检测
+	var interval = setInterval(function() {
+		if(isRunning) {
+			bulletMove();
+			foeMove();
+			// 判断子弹是否碰到敌机
+			var bullets = bullet.arr;
+			var foes = foe.arr;
+			var bulletItem;
+			var foeItem;
+			var index;
+			for(var i = 0; i < bullets.length; i++) {
+				bulletItem = bullets[i];
+				var bulletX = bulletItem.x + bullet.width/2;
+				var bulletY = bulletItem.y;
+				// 判断是否碰撞到敌机
+				for(var j = 0; j < foes.length; j++) {
+					foeItem = foes[j];
+					// 获取敌机的范围
+					var foeL = foeItem.x;
+					var foeR = foeItem.x + foe.width;
+					var foeU = foeItem.y;
+					var foeD = foeItem.y + foe.height;
+					// 判断子弹是否碰撞
+					var checkX = bulletX > foeL && bulletX < foeR;
+					var checkY = bulletY < foeD && bulletY > foeU;
+					if(checkX && checkY) {
+						console.log(bulletX, bulletY, foeL, foeR, foeU, foeD);
+						// 清除敌机
+						foeItem.item.parentNode.removeChild(foeItem.item);	
+						foes.splice(j, 1);
+						// 清除子弹
+						bulletItem.item.parentNode.removeChild(bulletItem.item);
+						bullets.splice(i, 1);
+					} else if(checkY) {
+						// console.log(bulletX, bulletY, foeL, foeR, foeU, foeD);
+					}
+				}
+			}
+		}
+	}, 10);
+</script>
+</html>
