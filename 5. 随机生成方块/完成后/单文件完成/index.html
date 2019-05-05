@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="container">
+    
+  </div>
+</body>
+<script>
+	// 获取容器
+	var container = document.getElementById('container');
+	
+	// 创建方块对象
+	function Box(parent, options) {
+		// 设置对象的属性
+		options = options || {};
+		this.backgroundColor = options.backgroundColor || 'red';
+		this.width = options.width || 20;
+		this.height = options.height || 20;
+		this.x = options.x || 0;
+		this.y = options.y || 0;
+		
+		// 创建元素
+		this.div = document.createElement('div');
+		parent.appendChild(this.div);
+		this.parent = parent;
+		
+		// 初始化元素
+		this.init();
+	}
+	// 添加类的原型方法: 初始化
+	Box.prototype.init = function() {
+		var div = this.div;
+		div.style.width = this.width + 'px';
+		div.style.height = this.height + 'px';
+		div.style.top = this.y + 'px';
+		div.style.left = this.x + 'px';
+		div.style.position = 'absolute';
+		div.style.backgroundColor = this.backgroundColor;
+	}
+	// 添加类的原型方法: 随机化方块位置
+	Box.prototype.random = function() {
+		var x = Math.random() * (this.parent.offsetWidth - this.width);
+		var y = Math.random() * (this.parent.offsetHeight - this.height);
+		// 更新位置
+		this.div.style.left = x + 'px';
+		this.div.style.top = y + 'px';
+	}
+	
+	// 随机数据方法
+	function getRandom(min, max) {
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+	
+	// 生成 10 个方法
+	var arr = [];
+	for(var i = 0; i < 10; i++) {
+		var r = getRandom(0, 255);
+		var g = getRandom(0, 255);
+		var b = getRandom(0, 255);
+		var box = new Box(container, {
+			backgroundColor: 'rgb(' + r + ', ' + g + ', ' + b + ')'
+		})
+		box.random();
+		arr.push(box);
+	}
+	// 更新方块位置
+	function randomPosition() {
+		for(var i = 0; i < arr.length; i++) {
+			var box = arr[i];
+			box.random();
+		}
+	}
+	setInterval(randomPosition, 1000);
+</script>
+</html>
