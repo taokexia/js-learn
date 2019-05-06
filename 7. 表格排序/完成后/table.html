@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        #ctn {
+            margin: 50px auto;
+            border: 1px solid #ccc;
+        }
+
+        td,
+        th {
+            border: 1px solid #ccc;
+            width: 100px;
+            height: 60px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <table id="ctn">
+        <!-- <thead> -->
+        <!-- <tr>
+                <th>姓名</th>
+                <th>年龄</th>
+                <th>学号</th>
+                <th>分数</th>
+            </tr> -->
+        <!-- </thead> -->
+        <!-- <tbody>
+            <tr>
+                <td>赵四</td>
+                <td>22</td>
+                <td>3</td>
+                <td>90</td>
+            </tr>
+        </tbody> -->
+    </table>
+</body>
+<script>
+	// 数据
+	var data = [
+		{ name: '赵六', age: 29, num: 3, score: 91 },
+		{ name: '李四', age: 24, num: 1, score: 93 },
+		{ name: '王五', age: 21, num: 5, score: 96 },
+		{ name: '钱八', age: 26, num: 4, score: 97 },
+		{ name: '张三', age: 22, num: 2, score: 99 }
+	];
+	var content = document.getElementById('ctn');
+	// 创建表格头部
+	var thead = document.createElement('thead');
+	// 插入头部内容
+	thead.innerHTML = '<tr>'
+		+ '<th type="name">姓名</th>'
+		+ '<th type="age">年龄</th>'
+		+ '<th type="num">学号</th>'
+		+ '<th type="score">分数</th>'
+		+ '</tr>';
+	// 插入到表格中
+	content.appendChild(thead);
+	
+	// 创建表格 body
+	var tbody = document.createElement('tbody');
+	// 插入内容
+	function getBody() {
+		var tag = '';
+		for(var i = 0; i < data.length; i++) {
+			var item = data[i];
+			tag += '<tr>'
+			  + '<td>' + item.name + '</td>'
+			  + '<td>' + item.age + '</td>'
+			  + '<td>' + item.num + '</td>'
+			  + '<td>' + item.score + '</td>'
+			  + '</tr>'
+		}
+		tbody.innerHTML = tag;
+	}
+	getBody();
+	// 插入到表格中
+	content.appendChild(tbody);
+	
+	// 给表格头部添加点击事件
+	var ths = thead.getElementsByTagName('th');
+	for(var i = 0; i < ths.length; i++) {
+		var th = ths[i];
+		// 添加点击事件
+		th.flag = 0;
+		th.onclick = function(e) {
+			var type = this.getAttribute('type');
+			if(this.flag === 0) {
+				// 升序
+				data.sort(function(a, b) {
+					if(type === 'name') {
+						return b[type] > a[type] ? 1 : -1
+					}
+					return b[type] - a[type];
+				})
+				this.flag = 1;
+			} else {
+				// 降序
+				data.sort(function(a, b) {
+					if(type === 'name') {
+						return a[type] > b[type] ? 1 : -1
+					}
+					return a[type] - b[type];
+				})
+				this.flag = 0;
+			}
+			// 更新界面
+			getBody();
+		}
+	}
+</script>
+</html>
