@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+    Array.prototype.reduce = function(callbackfn) {
+        const o = this;
+        const len = o.length;
+
+        let k = 0;
+        let accumulator = undefined;
+        let kPresent = false;
+        let initialValue = arguments.length > 1 ? arguments[1] : undefined;
+
+        if(typeof callbackfn !== 'function') {
+            throw new TypeError(callbackfn + 'is not a function');
+        }
+
+        if(len === 0 && arguments.length < 2) {
+            throw new TypeError('Reduce of empty array with no initial value');
+        }
+
+        if(arguments.length > 1) {
+            accumulator = initialValue;
+        } else {
+            accumulator = o[k];
+            k++;
+        }
+
+        while(k < len) {
+            kPresent = o.hasOwnProperty(k);
+
+            if(kPresent) {
+                const kValue = o[k];
+                accumulator = callbackfn.apply(undefined, [accumulator, kValue, k, o]);
+            }
+            k++;
+        }
+        return accumulator;
+    }
+    // 测试
+    const rReduce = ['1', null, undefined, , 3, 4].reduce((a, b) => a + b, 3);
+    const mReduce = ['1', null, undefined, , 3, 4].reduce((a, b) => a + b, 3);
+    console.log(rReduce, mReduce);
+    // 31nullundefined34 31nullundefined34
+</script>
+</html>
